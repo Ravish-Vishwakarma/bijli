@@ -5,7 +5,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { Input } from "./components/ui/input";
 import Fuse from "fuse.js";
 import { open } from "@tauri-apps/plugin-dialog";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { useMemo } from "react";
 function App() {
@@ -69,7 +69,24 @@ function App() {
     }
   }, []);
 
-  const columns = 3;
+  const gridRef = useRef<HTMLDivElement>(null);
+  const [columns, setColumns] = useState(3);
+  useEffect(() => {
+    const updateColumns = () => {
+      if (!gridRef.current) return;
+
+      const gridWidth = gridRef.current.offsetWidth;
+      const itemWidth = 180; // same as min width
+      const gap = 16; // gap-4 = 1rem = 16px
+
+      const calculated = Math.floor(gridWidth / (itemWidth + gap));
+      setColumns(calculated > 0 ? calculated : 1);
+    };
+
+    updateColumns();
+    window.addEventListener("resize", updateColumns);
+    return () => window.removeEventListener("resize", updateColumns);
+  }, []);
   return (
     <main className="container">
       <div>
@@ -147,7 +164,7 @@ function App() {
             <RefreshCcw ></RefreshCcw >
           </Button>
         </div>
-        <div className="mt-6 grid grid-cols-3 gap-4 p-6">
+        <div ref={gridRef} className="mt-6 grid gap-4 p-6 [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))]">
           {filteredMemes.map((meme, index) => (
             <div key={index} className={`border rounded-xl p-2 ${index === selectedIndex ? "bg-green-200" : ""}`}>
               <img

@@ -10,6 +10,7 @@
     "frontendDist": "../dist"
   },
   "app": {
+    "withGlobalTauri": true,
     "windows": [
       {
         "title": "bijli",
@@ -19,10 +20,13 @@
     ],
     "security": {
       "csp": null,
+      "capabilities": [
+        "default"
+      ],
       "assetProtocol": {
         "enable": true,
         "scope": [
-          "E:/louisedrive/Social Assets/Memes + Sound Effects/Indian Humour/**"
+          "**"
         ]
       }
     }

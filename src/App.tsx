@@ -1,10 +1,10 @@
 import "./App.css";
 import { Button } from "./components/ui/button";
-import { Folder, FolderPlus, RefreshCcw } from "lucide-react";
+import { FolderPlus, RefreshCcw } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
 import { Input } from "./components/ui/input";
 import Fuse from "fuse.js";
-import { open } from "@tauri-apps/plugin-dialog";
+import { open as openDialog } from "@tauri-apps/plugin-dialog";
 import { useEffect, useRef, useState } from "react";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { useMemo } from "react";
@@ -33,9 +33,6 @@ function App() {
     setMemes(formatted);
   };
 
-  const handelcheck = () => {
-    console.log(filteredMemes)
-  }
 
   const fuse = useMemo(() => {
     return new Fuse(memes, {
@@ -87,12 +84,35 @@ function App() {
     window.addEventListener("resize", updateColumns);
     return () => window.removeEventListener("resize", updateColumns);
   }, []);
-  return (
-    <main className="container">
-      <div>
+  const copyMeme = async (meme: { path: string }, index: number) => {
+    try {
+      await invoke("copy_image", { path: meme.path });
 
+      setCopiedIndex(index);
+
+      setTimeout(() => {
+        setCopiedIndex(null);
+      }, 180);
+
+      setSearch("");
+      setSelectedIndex(0);
+      inputRef.current?.focus();
+    } catch (err) {
+      console.error("Copy failed", err);
+    }
+  };
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  return (
+    <main className="flex items-start justify-center pt-20">
+      <div className="w-[650px] backdrop-blur-xl bg-white/10 rounded-2xl p-6">
         <div className="flex flex-row justify-evenly p-10">
-          <Input value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={async (e) => {
+          <Input value={search} ref={inputRef} autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck={false} onChange={(e) => setSearch(e.target.value)} onKeyDown={async (e) => {
             if (e.key === "ArrowRight") {
               e.preventDefault();
               setSelectedIndex((prev) =>
@@ -124,7 +144,7 @@ function App() {
             if (e.key === "Enter") {
               const selected = filteredMemes[selectedIndex];
               if (selected) {
-                await invoke("copy_image", { path: selected.path });
+                await copyMeme(selected, selectedIndex);
               }
             }
           }} id="input-demo-api-key" placeholder="meme name.." />
@@ -134,7 +154,7 @@ function App() {
             size="icon"
             aria-label="Add Meme Folder"
             onClick={async () => {
-              const selected = await open({
+              const selected = await openDialog({
                 directory: true,
                 multiple: false,
               });
@@ -157,16 +177,33 @@ function App() {
           >
             <FolderPlus />
           </Button>
-          <Button onClick={handelcheck} variant={"outline"} size={"icon"} aria-label="Open Meme Folder">
-            <Folder></Folder>
-          </Button>
+
+
+
           <Button onClick={handleRefresh} variant={"outline"} size={"icon"} aria-label="Open Meme Folder">
             <RefreshCcw ></RefreshCcw >
           </Button>
+
         </div>
-        <div ref={gridRef} className="mt-6 grid gap-4 p-6 [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))]">
+
+        {search && (<div
+          ref={gridRef}
+          className="mt-6 max-h-[350px] overflow-y-auto grid gap-4 p-2 [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))]"
+        >
           {filteredMemes.map((meme, index) => (
-            <div key={index} className={`border rounded-xl p-2 ${index === selectedIndex ? "bg-green-200" : ""}`}>
+            <div
+              key={index}
+              onClick={async () => {
+                setSelectedIndex(index);
+                await copyMeme(meme, index);
+              }}
+              className={`border rounded-xl p-2 cursor-pointer transition duration-150 ${copiedIndex === index
+                ? "bg-green-400 scale-105"
+                : index === selectedIndex
+                  ? "bg-green-200"
+                  : "hover:bg-gray-100"
+                }`}
+            >
               <img
                 src={`${convertFileSrc(meme.path)}`}
                 alt="meme"
@@ -177,7 +214,7 @@ function App() {
               </p>
             </div>
           ))}
-        </div>
+        </div>)}
       </div>
     </main>
   );

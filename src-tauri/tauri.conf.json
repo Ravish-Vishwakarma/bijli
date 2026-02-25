@@ -15,7 +15,13 @@
       {
         "title": "bijli",
         "width": 800,
-        "height": 600
+        "height": 650,
+        "transparent": true,
+        "decorations": false,
+        "center": true,
+        "skipTaskbar": false,
+        "resizable": false,
+        "alwaysOnTop": false
       }
     ],
     "security": {

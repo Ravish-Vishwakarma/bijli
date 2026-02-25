@@ -10,22 +10,12 @@
     "frontendDist": "../dist"
   },
   "app": {
-    "activationPolicy": "Accessory",
     "withGlobalTauri": true,
     "windows": [
       {
-        "label": "main",
-        "title": "Bijli",
-        "width": 900,
-        "height": 600,
-        "transparent": true,
-        "decorations": false,
-        "resizable": false,
-        "center": true,
-        "shadow": false,
-        "alwaysOnTop": true,
-        "visible": false,
-        "skipTaskbar": true
+        "title": "bijli",
+        "width": 800,
+        "height": 600
       }
     ],
     "security": {

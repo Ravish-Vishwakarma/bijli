@@ -122,15 +122,3 @@
     @apply bg-background text-foreground;
     }
 }
-
-body {
-  background: transparent;
-}
-
-html, body {
-  overflow: hidden;
-}
-::-webkit-scrollbar {
-  width: 0px;
-  background: transparent;
-}

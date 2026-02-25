@@ -1,14 +1,9 @@
-use arboard::Clipboard;
-use image::GenericImageView;
-use tauri::Manager;
-use walkdir::WalkDir;
-
-// ---------------- COMMANDS ----------------
-
+// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
+use walkdir::WalkDir;
 
 #[tauri::command]
 fn scan_memes(folder_path: String) -> Vec<String> {
@@ -30,6 +25,20 @@ fn scan_memes(folder_path: String) -> Vec<String> {
     files
 }
 
+#[cfg_attr(mobile, tauri::mobile_entry_point)]
+pub fn run() {
+    tauri::Builder::default()
+        .plugin(tauri_plugin_clipboard_manager::init())
+        .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
+        .invoke_handler(tauri::generate_handler![greet, scan_memes, copy_image])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
+}
+
+use arboard::Clipboard;
+use image::GenericImageView;
+
 #[tauri::command]
 fn copy_image(path: String) -> Result<(), String> {
     let img = image::open(&path).map_err(|e| e.to_string())?;
@@ -47,56 +56,4 @@ fn copy_image(path: String) -> Result<(), String> {
         .map_err(|e| e.to_string())?;
 
     Ok(())
-}
-
-// ---------------- RUN ----------------
-
-#[cfg_attr(mobile, tauri::mobile_entry_point)]
-pub fn run() {
-    tauri::Builder::default()
-        .plugin(tauri_plugin_clipboard_manager::init())
-        .plugin(tauri_plugin_dialog::init())
-        .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
-        .plugin(tauri_plugin_tray::init()) // ✅ tray is a plugin in v2
-        .invoke_handler(tauri::generate_handler![greet, scan_memes, copy_image])
-        .setup(|app| {
-            let handle = app.handle();
-
-            // TRAY
-            use tauri_plugin_tray::{TrayIconBuilder, TrayIconEvent};
-
-            TrayIconBuilder::new(app)
-                .on_tray_icon_event(move |_, event| {
-                    if let TrayIconEvent::Click { .. } = event {
-                        if let Some(window) = handle.get_webview_window("main") {
-                            if window.is_visible().unwrap() {
-                                let _ = window.hide();
-                            } else {
-                                let _ = window.show();
-                                let _ = window.set_focus();
-                            }
-                        }
-                    }
-                })
-                .build()?;
-
-            // GLOBAL SHORTCUT
-            use tauri_plugin_global_shortcut::GlobalShortcutExt;
-
-            app.global_shortcut().register("Ctrl+Space", move || {
-                if let Some(window) = handle.get_webview_window("main") {
-                    if window.is_visible().unwrap() {
-                        let _ = window.hide();
-                    } else {
-                        let _ = window.show();
-                        let _ = window.set_focus();
-                    }
-                }
-            })?;
-
-            Ok(())
-        })
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
 }

@@ -1,9 +1,10 @@
 import "./App.css";
 import { invoke, convertFileSrc } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
+import { open as WebOpen } from "@tauri-apps/plugin-shell";
 import { useEffect, useRef, useState, useMemo } from "react";
 import Fuse from "fuse.js";
-import { RefreshCw, FolderPlus } from "lucide-react";
+import { RefreshCw, FolderPlus, Info } from "lucide-react";
 
 function App() {
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -17,6 +18,12 @@ function App() {
     () => new Fuse(memes, { keys: ["name"], threshold: 0.4 }),
     [memes]
   );
+
+
+
+  const handleWebOpen = async () => {
+    await WebOpen("https://ravishvish.gumroad.com/coffee");
+  };
 
   const filteredMemes = search
     ? fuse.search(search).map((r) => r.item)
@@ -408,6 +415,9 @@ function App() {
 
             <button className="icon-btn" title="Refresh" onClick={handleRefresh}>
               <RefreshCw />
+            </button>
+            <button className="icon-btn" title="Made with ❤️ by Ravish" onClick={handleWebOpen}>
+              <Info />
             </button>
           </div>
 

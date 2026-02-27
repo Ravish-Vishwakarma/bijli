@@ -69,6 +69,7 @@ pub fn run() {
                         println!("menu item {:?} not handled", event.id);
                     }
                 })
+                .tooltip("DHOKLA")
                 .build(app)?;
 
             Ok(())

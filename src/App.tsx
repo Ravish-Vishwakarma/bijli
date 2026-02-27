@@ -351,7 +351,7 @@ function App() {
         <div className="container">
           {/* Header */}
           <div className="header">
-            <span className="title">BIJLI</span>
+            <span className="title">DHOKLA</span>
             <span className="subtitle">/ pick &amp; copy</span>
           </div>
 

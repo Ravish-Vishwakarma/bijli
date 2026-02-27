@@ -62,8 +62,16 @@ function App() {
     await invoke("copy_image", { path });
     setCopied(true);
     setTimeout(() => setCopied(false), 1400);
+    setSearch("");
+    setSelectedIndex(0);
+    inputRef.current?.focus();
+    await invoke("hide_window");
   };
 
+  const inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
   return (
     <>
       <style>{`
@@ -72,7 +80,7 @@ function App() {
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-          background-color: rgba(0, 0, 0, 0.45);
+          background-color: rgba(0, 0, 0, 0.6);
           font-family: 'Space Mono', monospace;
            overflow: hidden;
         }
@@ -351,7 +359,7 @@ function App() {
         <div className="container">
           {/* Header */}
           <div className="header">
-            <span className="title">DHOKLA</span>
+            <span className="title">BIJLI</span>
             <span className="subtitle">/ pick &amp; copy</span>
           </div>
 
@@ -363,6 +371,7 @@ function App() {
               </svg>
               <input
                 className="search-input"
+                ref={inputRef}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={async (e) => {

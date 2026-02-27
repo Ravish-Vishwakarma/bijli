@@ -30,3 +30,6 @@ walkdir = "2.5.0"
 tauri-plugin-dialog = "2"
 tauri-plugin-shell = "2.3.5"
 
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+tauri-plugin-global-shortcut = "2"
+

@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "bijli",
+  "productName": "BIJLI",
   "version": "0.1.0",
   "identifier": "com.ramdeenpc.bijli",
   "build": {
@@ -13,7 +13,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "bijli",
+        "title": "BIJLI",
         "width": 800,
         "height": 650,
         "transparent": true,
@@ -21,7 +21,8 @@
         "center": true,
         "skipTaskbar": true,
         "resizable": false,
-        "alwaysOnTop": true
+        "alwaysOnTop": true,
+        "visible": false
       }
     ],
     "security": {

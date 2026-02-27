@@ -4,6 +4,8 @@
 
 BIJLI is a lightning fast, keyboard centric launcher designed to put your entire local meme collection just one shortcut away. Stop digging through nested folders hit the hotkey, type, and copy.
 
+<img width="830" height="670" alt="image" src="https://github.com/user-attachments/assets/9e54aa22-7221-4f41-aa8f-746a27d71a8c" />
+
 ## ✨ Features
 
 - **🚀 Instant Access**: Toggle the launcher instantly from anywhere with `Ctrl+Shift+M`.

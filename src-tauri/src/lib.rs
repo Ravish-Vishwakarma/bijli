@@ -108,12 +108,28 @@ use image::GenericImageView;
 
 #[tauri::command]
 fn copy_image(path: String) -> Result<(), String> {
+    let ext = std::path::Path::new(&path)
+        .extension()
+        .and_then(|e| e.to_str())
+        .unwrap_or("")
+        .to_lowercase();
+
+    if ext == "gif" {
+        // Copy file to clipboard like file explorer does (Windows)
+        let script = format!("Set-Clipboard -Path '{}'", path.replace("'", "''"));
+        std::process::Command::new("powershell")
+            .args(["-Command", &script])
+            .output()
+            .map_err(|e| e.to_string())?;
+        return Ok(());
+    }
+
+    // existing image copy logic for png/jpg/etc
     let img = image::open(&path).map_err(|e| e.to_string())?;
     let rgba = img.to_rgba8();
     let (width, height) = img.dimensions();
 
     let mut clipboard = Clipboard::new().map_err(|e| e.to_string())?;
-
     clipboard
         .set_image(arboard::ImageData {
             width: width as usize,
